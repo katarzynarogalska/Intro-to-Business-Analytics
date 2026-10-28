@@ -1,7 +1,8 @@
 import json
 import re
+import os
 
-filepath = "main.ipynb"
+filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "main.ipynb")
 
 with open(filepath, "r", encoding="utf-8") as f:
     data = json.load(f)
