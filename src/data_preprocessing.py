@@ -274,6 +274,19 @@ def drop_duplicate_rows(df: pd.DataFrame) -> pd.DataFrame:
     print(f"  dropped {n0 - len(df)} duplicated rows")
     return df
 
+def add_site(df: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
+    # "CAMBRIDGE 3" -> "CAMBRIDGE", "RINCONADA LIB 2" -> "RINCONADA LIB", "SHERMAN 14" -> "SHERMAN"
+    df = df.copy()
+    df["site"] = (df["Station Name"].astype(str)
+                  .str.replace(r"\s*#?\s*\d+\s*$", "", regex=True)   # numer stanowiska na końcu
+                  .str.replace(r"\s+", " ", regex=True)              # podwójne spacje
+                  .str.strip())
+    if verbose:
+        print("[add site column]")
+        print(f"  {df['Station Name'].nunique()} stations -> {df['site'].nunique()} sites: "
+              f"{sorted(df['site'].unique())}")
+    return df
+
 # order matters
 PIPELINE = [
     ("IDs -> strings", convert_ids_to_string),
@@ -292,6 +305,7 @@ PIPELINE = [
     ("check Start <= End", check_start_before_end),
     ("remove outliers", remove_failed_sessions),
     ("drop duplicate rows", drop_duplicate_rows),
+    ("add site column", add_site),
 ]
 
 
